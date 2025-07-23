@@ -3,6 +3,7 @@ import SwiftUI
 
 final class MonitorService: ObservableObject {
     @Published var events: [DispatchEvent] = []
+    @Published var isLoading: Bool = false
     private var timer: Timer?
     private let storageKey = "savedEvents"
 
@@ -21,7 +22,11 @@ final class MonitorService: ObservableObject {
 
     private func fetch() {
         guard let url = URL(string: "https://www.lcdes.org/monitor.html") else { return }
+        DispatchQueue.main.async { self.isLoading = true }
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            defer {
+                DispatchQueue.main.async { self.isLoading = false }
+            }
             guard let data = data, error == nil else { return }
             if let html = String(data: data, encoding: .utf8) {
                 let parsed = self.parseHTML(html)

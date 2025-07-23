@@ -6,4 +6,6 @@ The Lebanon Country Emergency Monitor app fetches dispatch information from the 
 
 Open the project in Xcode (iOS 17 or later) and run `LebanonCountryEmergencyMonitorApp` on an iOS device or simulator. The app polls `https://www.lcdes.org/monitor.html` every 30 seconds and displays the parsed events in a list.
 
-On launch the app immediately fetches the current monitor page and persists the events so previous results appear the next time you open the app.
+
+On launch the app immediately fetches the current monitor page and persists the events so previous results appear the next time you open the app. If the fetch fails, the app shows a "No events available" message rather than an endless loading indicator.
+

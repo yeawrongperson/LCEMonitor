@@ -6,8 +6,11 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Group {
-                if service.events.isEmpty {
+                if service.isLoading && service.events.isEmpty {
                     ProgressView("Loading...")
+                } else if service.events.isEmpty {
+                    Text("No events available")
+                        .foregroundColor(.secondary)
                 } else {
                     List(service.events) { event in
                         VStack(alignment: .leading) {
