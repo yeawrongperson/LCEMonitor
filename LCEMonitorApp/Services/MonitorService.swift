@@ -67,6 +67,7 @@ final class MonitorService: ObservableObject {
             }
         }
         return parsed
+
     }
 
     private func saveEvents(_ events: [DispatchEvent]) {
