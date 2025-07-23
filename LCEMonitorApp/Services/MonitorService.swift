@@ -40,31 +40,34 @@ final class MonitorService: ObservableObject {
     }
 
     private func parseHTML(_ html: String) -> [DispatchEvent] {
-        // Simple naive parsing; adjust depending on site structure
-        var results: [DispatchEvent] = []
-        let lines = html.components(separatedBy: "\n")
-        for line in lines {
-            if line.contains("<tr") {
-                // Extract pieces between <td> tags as sample
-                let parts = line.components(separatedBy: "<td>")
-                if parts.count > 1 {
-                    var entries: [String] = []
-                    for part in parts.dropFirst() {
-                        if let end = part.range(of: "</td>") {
-                            let value = String(part[..<end.lowerBound])
-                                .replacingOccurrences(of: "&nbsp;", with: " ")
-                                .trimmingCharacters(in: .whitespacesAndNewlines)
-                            entries.append(value)
-                        }
-                    }
-                    if let first = entries.first {
-                        let rest = entries.dropFirst().joined(separator: " ")
-                        results.append(DispatchEvent(title: first, detail: rest))
-                    }
-                }
+        var parsed: [DispatchEvent] = []
+        let rowRegex = try? NSRegularExpression(pattern: "<tr[^>]*>(.*?)</tr>", options: [.caseInsensitive, .dotMatchesLineSeparators])
+        let cellRegex = try? NSRegularExpression(pattern: "<td[^>]*>(.*?)</td>", options: [.caseInsensitive, .dotMatchesLineSeparators])
+
+        let htmlRange = NSRange(location: 0, length: html.utf16.count)
+        rowRegex?.enumerateMatches(in: html, options: [], range: htmlRange) { match, _, _ in
+            guard let match = match else { return }
+            let rowHTML = (html as NSString).substring(with: match.range(at: 1))
+            let rowRange = NSRange(location: 0, length: rowHTML.utf16.count)
+            var cells: [String] = []
+            cellRegex?.enumerateMatches(in: rowHTML, options: [], range: rowRange) { cellMatch, _, _ in
+                guard let cellMatch = cellMatch else { return }
+                var cell = (rowHTML as NSString).substring(with: cellMatch.range(at: 1))
+                cell = cell.replacingOccurrences(of: "&nbsp;", with: " ")
+                cell = cell.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+                cell = cell.trimmingCharacters(in: .whitespacesAndNewlines)
+                cells.append(cell)
+            }
+
+            if cells.count >= 4 {
+                let header = cells[0].lowercased()
+                if header.contains("time") && cells[1].lowercased().contains("date") { return }
+                let event = DispatchEvent(time: cells[0], date: cells[1], message: cells[2], location: cells[3])
+                parsed.append(event)
             }
         }
-        return results
+        return parsed
+
     }
 
     private func saveEvents(_ events: [DispatchEvent]) {

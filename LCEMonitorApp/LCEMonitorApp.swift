@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct LebanonCountryEmergencyMonitorApp: App {
+struct LebanonCountyEmergencyMonitorApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

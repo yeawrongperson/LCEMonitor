@@ -13,16 +13,19 @@ struct ContentView: View {
                         .foregroundColor(.secondary)
                 } else {
                     List(service.events) { event in
-                        VStack(alignment: .leading) {
-                            Text(event.title)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(event.date) \(event.time)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(event.message)
                                 .font(.headline)
-                            Text(event.detail)
+                            Text(event.location)
                                 .font(.subheadline)
                         }
                     }
                 }
             }
-            .navigationTitle("Lebanon Country Emergency Monitor")
+            .navigationTitle("Lebanon County Emergency Monitor")
         }
     }
 }
