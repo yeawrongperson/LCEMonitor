@@ -20,9 +20,6 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Lebanon Country Emergency Monitor")
-            .onAppear {
-                service.start()
-            }
         }
     }
 }

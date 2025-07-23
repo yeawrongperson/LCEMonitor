@@ -8,9 +8,11 @@ final class MonitorService: ObservableObject {
 
     init() {
         loadSavedEvents()
+        start()
     }
 
     func start() {
+        guard timer == nil else { return }
         fetch()
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             self?.fetch()
