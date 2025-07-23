@@ -5,15 +5,21 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            List(service.events) { event in
-                VStack(alignment: .leading) {
-                    Text(event.title)
-                        .font(.headline)
-                    Text(event.detail)
-                        .font(.subheadline)
+            Group {
+                if service.events.isEmpty {
+                    ProgressView("Loading...")
+                } else {
+                    List(service.events) { event in
+                        VStack(alignment: .leading) {
+                            Text(event.title)
+                                .font(.headline)
+                            Text(event.detail)
+                                .font(.subheadline)
+                        }
+                    }
                 }
             }
-            .navigationTitle("LC Monitor")
+            .navigationTitle("Lebanon Country Emergency Monitor")
             .onAppear {
                 service.start()
             }

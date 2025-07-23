@@ -4,6 +4,11 @@ import SwiftUI
 final class MonitorService: ObservableObject {
     @Published var events: [DispatchEvent] = []
     private var timer: Timer?
+    private let storageKey = "savedEvents"
+
+    init() {
+        loadSavedEvents()
+    }
 
     func start() {
         fetch()
@@ -20,6 +25,7 @@ final class MonitorService: ObservableObject {
                 let parsed = self.parseHTML(html)
                 DispatchQueue.main.async {
                     self.events = parsed
+                    self.saveEvents(parsed)
                 }
             }
         }
@@ -52,5 +58,18 @@ final class MonitorService: ObservableObject {
             }
         }
         return results
+    }
+
+    private func saveEvents(_ events: [DispatchEvent]) {
+        if let data = try? JSONEncoder().encode(events) {
+            UserDefaults.standard.set(data, forKey: storageKey)
+        }
+    }
+
+    private func loadSavedEvents() {
+        if let data = UserDefaults.standard.data(forKey: storageKey),
+           let saved = try? JSONDecoder().decode([DispatchEvent].self, from: data) {
+            self.events = saved
+        }
     }
 }
